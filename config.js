@@ -1,4 +1,7 @@
+const rateLimit = require('express-rate-limit');
+
 const devSecret = 'dev';
+const devPORT = 3000;
 
 const options = {
   origin: [
@@ -15,8 +18,15 @@ const options = {
 
 const mongodbRoute = 'mongodb://localhost:27017/moviesdb';
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
 module.exports = {
   devSecret,
   options,
   mongodbRoute,
+  limiter,
+  devPORT,
 };

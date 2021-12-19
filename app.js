@@ -3,59 +3,38 @@ const express = require('express');
 
 const app = express();
 const mongoose = require('mongoose');
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
 const helmet = require('helmet');
 const cors = require('cors');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { auth } = require('./middlewares/auth');
-const NotFoundErr = require('./errors/NotFoundErr');
-const { createUser, login } = require('./controllers/users');
-const routerUser = require('./routes/users');
-const routerMovies = require('./routes/movies');
+const { errorCentralized } = require('./middlewares/error');
+const router = require('./routes/index');
 
-const { PORT } = process.env;
-const { mongodbRoute, options } = require('./config');
+const { PORT, MONGO, NODE_ENV } = process.env;
+const {
+  mongodbRoute,
+  options,
+  limiter,
+  devPORT,
+} = require('./config');
 
-mongoose.connect(mongodbRoute, {});
+mongoose.connect(NODE_ENV === 'production' ? MONGO : mongodbRoute, {});
 app.use(express.json());
 app.use(helmet());
+app.use(limiter);
 
 app.use('*', cors(options));
 app.use(requestLogger);
 
-app.post('/signup', celebrate({
-  body: Joi.object().options({ abortEarly: false }).keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(8).max(32).required(),
-    name: Joi.string().min(2).max(32).required(),
-  }),
-}), createUser);
-
-app.post('/signin', celebrate({
-  body: Joi.object().options({ abortEarly: false }).keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(8).max(72).required(),
-  }),
-}), login);
-
-app.use(auth);
-app.use('/users', routerUser);
-app.use('/movies', routerMovies);
-app.use('*', () => { throw new NotFoundErr('Запрашиваемый ресурс не найден'); });
+app.use(router);
 
 app.use(errorLogger);
 
 app.use(errors());
-app.use((err, req, res) => {
-  if (err.statusCode) {
-    res.status(err.statusCode).send({ message: err.message });
-  } else {
-    res.status(500).send({ message: err.message });
-  }
-});
+app.use(errorCentralized);
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-  console.log(mongoose.connection.readyState, mongodbRoute);
+app.listen(NODE_ENV === 'production' ? PORT : devPORT, () => {
+  console.log(`App listening on port ${NODE_ENV === 'production' ? PORT : devPORT}`);
+  console.log(mongoose.connection.readyState, NODE_ENV === 'production' ? MONGO : mongodbRoute);
 });

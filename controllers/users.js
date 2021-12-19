@@ -38,6 +38,8 @@ const editUser = (req, res, next) => modelUser.findByIdAndUpdate(
   .catch((err) => {
     if (err instanceof mongoose.Error.ValidationError) {
       next(new BadRequestErr('Переданы некорректные данные пользователя'));
+    } else if (err.code === 11000) {
+      next(new DoubleErr('Пользователь с такой электронной почтой уже зарегистрирован'));
     } else {
       next(err);
     }
@@ -50,12 +52,20 @@ const createUser = (req, res, next) => bcrypt.hash(req.body.password, salt)
     } = req.body;
     return modelUser.create({
       name, email, password: hash,
+    }).catch((err) => {
+      next(err);
     })
-      .then((user) => res.send({ data: user }))
+      .then((user) => res.send({
+        user: {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+        },
+      }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
           next(new BadRequestErr('Переданы некорректные данные при создании пользователя'));
-        } else if (err.name === 'MongoServerError' && err.code === 11000) {
+        } else if (err.code === 11000) {
           next(new DoubleErr('Пользователь с такой электронной почтой уже зарегистрирован'));
         } else {
           next(err);
