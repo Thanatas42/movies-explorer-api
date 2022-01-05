@@ -1,7 +1,7 @@
 const modelMovie = require('../models/movie');
 
 const NotFoundErr = require('../errors/NotFoundErr');
-const BadRequestErr = require('../errors/NotFoundErr');
+const BadRequestErr = require('../errors/BadRequestErr');
 const ForbiddenErr = require('../errors/ForbiddenErr');
 
 const getMovies = (req, res, next) => modelMovie.find({ owner: req.user._id })
@@ -21,6 +21,7 @@ const createMovies = (req, res, next) => {
     country, director, duration, year, description,
     image, trailer, nameRU, nameEN, thumbnail, movieId,
   } = req.body;
+  const owner = req.user._id;
   return modelMovie.create({
     country,
     director,
@@ -33,10 +34,11 @@ const createMovies = (req, res, next) => {
     nameEN,
     thumbnail,
     movieId,
+    owner,
   })
     .then((movies) => res.send({ data: movies }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' && res.status(400)) {
         next(new BadRequestErr('Переданы некорректные данные при создании фильма'));
       } else {
         next(err);

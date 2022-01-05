@@ -25,9 +25,9 @@ router.post('/signin', celebrate({
   }),
 }), login);
 
-router.use(auth);
 router.use('/users', routerUser);
 router.use('/movies', routerMovies);
+router.use(auth);
 router.use('*', () => { throw new NotFoundErr('Запрашиваемый ресурс не найден'); });
 
 module.exports = router;
