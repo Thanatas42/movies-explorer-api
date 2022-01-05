@@ -22,10 +22,11 @@ const {
 mongoose.connect(NODE_ENV === 'production' ? MONGO : mongodbRoute, {});
 app.use(express.json());
 app.use(helmet());
+
+app.use(requestLogger);
 app.use(limiter);
 
 app.use('*', cors(options));
-app.use(requestLogger);
 
 app.use(router);
 
