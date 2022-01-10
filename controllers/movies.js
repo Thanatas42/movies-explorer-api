@@ -38,7 +38,7 @@ const createMovies = (req, res, next) => {
   })
     .then((movies) => res.send({ data: movies }))
     .catch((err) => {
-      if (err.name === 'ValidationError' && res.status(400)) {
+      if (err.name === 'ValidationError') {
         next(new BadRequestErr('Переданы некорректные данные при создании фильма'));
       } else {
         next(err);
