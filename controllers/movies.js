@@ -23,6 +23,7 @@ const createMovies = (req, res, next) => {
   } = req.body;
   const owner = req.user._id;
   return modelMovie.create({
+    _id: movieId,
     country,
     director,
     duration,
