@@ -23,6 +23,7 @@ const createMovies = (req, res, next) => {
   } = req.body;
   const owner = req.user._id;
   return modelMovie.create({
+    _id: movieId,
     country,
     director,
     duration,
@@ -46,7 +47,7 @@ const createMovies = (req, res, next) => {
     });
 };
 
-const deleteMovie = (req, res, next) => modelMovie.find({ movieId: req.params.movieId })
+const deleteMovie = (req, res, next) => modelMovie.findById(req.params.movieId)
   .then((movie) => {
     if (movie === null) {
       throw new NotFoundErr(`Фильм c id ${req.params.movieId} не найден`);

@@ -36,7 +36,7 @@ app.use(errorLogger);
 app.use(errors());
 app.use(errorCentralized);
 
-app.listen(NODE_ENV === 'production' ? PORT : devPORT, () => {
+app.listen(NODE_ENV === 'production' ? 3001 : 3001, () => {
   console.log(`App listening on port ${NODE_ENV === 'production' ? PORT : devPORT}`);
   console.log(mongoose.connection.readyState, NODE_ENV === 'production' ? MONGO : mongodbRoute);
 });

@@ -1,7 +1,7 @@
 const rateLimit = require('express-rate-limit');
 
 const devSecret = 'dev';
-const devPORT = 3000;
+const devPORT = 3001;
 
 const options = {
   origin: [
