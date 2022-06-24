@@ -8,6 +8,8 @@ const options = {
     'http://localhost:3001',
     'http://localhost:3000',
     'https://api.movies-dmitry.nomoredomains.rocks',
+    'https://movies-dmitry.nomoredomains.xyz',
+    'https://www.movies-dmitry.nomoredomains.xyz',
   ],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   preflightContinue: false,
